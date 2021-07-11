@@ -53,10 +53,28 @@ class Main extends React.Component{
             //console.log(this.state.task);
     };
     handleSubmit(value){
-        this.setState({
+        var today=new Date();
+        var dd=String(today.getDate()).padStart(2, '0');
+        var mm=String(today.getMonth()+1).padStart(2, '0');
+        var yyyy=String(today.getFullYear());
+        const newItem={
+            Ngay: yyyy+'-'+mm+'-'+dd,
+            JobName: value,
+            Description: 'not finished'
+        }
+        console.log(today.toString());
+        console.log(value);
+        /*this.setState({
             jobs: this.state.jobs.concat(value),
             status: this.state.status.concat("OK"),
-        });
+        });*/
+        axios.post('/api/insert', newItem)
+            .then(res=>{
+                let task=this.state.task;
+                task = [newItem,...task];
+                this.setState({task: task});
+            })
+            .catch(error=>console.log(error));
     }
     render(){
         //console.log(this.state.jobs);
