@@ -29,12 +29,13 @@ app.get('/api/task', (req, res) => {
 });
 
 app.post('/api/insert', function(req, res) {
-    var sql = "INSERT " +
-        "INTO TaskDate(Ngay, JobName,Description) " +
-        "VALUES ('" +
-        req.body.Ngay + "','" +
-        req.body.JobName + "','" +
-        req.body.Description + "')";
+    var sql = "INSERT "
+        + "INTO TaskDate(Ngay, JobName,Description) "
+        + "VALUES ('"
+        + req.body.Ngay + "','"
+        + req.body.JobName + "','"
+        + req.body.Description + "')";
+    console.log(sql);
     connection.query(sql, function(err, results) {
         if (err) throw err;
         res.json({ task: results });

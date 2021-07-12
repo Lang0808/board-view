@@ -52,18 +52,18 @@ class Main extends React.Component{
             .catch(error=>console.log(error));
             //console.log(this.state.task);
     };
-    handleSubmit(value){
+    handleSubmit(JobName, Description){
         var today=new Date();
         var dd=String(today.getDate()).padStart(2, '0');
         var mm=String(today.getMonth()+1).padStart(2, '0');
         var yyyy=String(today.getFullYear());
         const newItem={
             Ngay: yyyy+'-'+mm+'-'+dd,
-            JobName: value,
-            Description: 'not finished'
+            JobName: JobName,
+            Description: Description
         }
         console.log(today.toString());
-        console.log(value);
+        //console.log(value);
         /*this.setState({
             jobs: this.state.jobs.concat(value),
             status: this.state.status.concat("OK"),
@@ -85,7 +85,7 @@ class Main extends React.Component{
                     <Board task={this.state.task}/>
                 </div>
                 <div>
-                    <App onSubmit={(value)=>this.handleSubmit(value)}/>
+                    <App onSubmit={(JobName, Description)=>this.handleSubmit(JobName, Description)}/>
                 </div>
                 <div>
                 <ul>
@@ -132,25 +132,34 @@ class TaskInput extends React.Component{
     constructor(props){
         super(props);
         this.state={
-            value:'Write something'
+            JpbName:'',
+            Description: '',
         };
         this.handleChange=this.handleChange.bind(this);
         this.handleSubmit=this.handleSubmit.bind(this);
     }
     handleSubmit(event){
-        this.props.onSubmit(this.state.value);
+        this.props.onSubmit(this.state.JobName, this.state.Description);
         event.preventDefault();
     }
-    handleChange(event) {    
-        this.setState({value: event.target.value});  
+    handleChange(event) {  
+        const target=event.target;  
+        const name=target.name;
+        const value=target.value;
+        this.setState({[name]: value});     
     }
     render(){
         return (
             <form onSubmit={this.handleSubmit}>
-                <div>
-                    <label>Your jobs: 
+                <div id="popupInput">
+                    <label className="text">Your jobs: 
                         <div>
-                            <textarea type="text" value={this.state.value} onChange={this.handleChange}/>
+                            <textarea name="JobName" type="text" value={this.state.JobName} onChange={this.handleChange}/>
+                        </div>
+                    </label>
+                    <label className="text">Description:
+                        <div>
+                            <textarea name="Description" type="text" value={this.state.Description} onChange={this.handleChange}/>
                         </div>
                     </label>
                 </div>
@@ -172,7 +181,7 @@ function App(props){
                         onClick={togglePopup}/>
                 {isOpen && 
                     <Popup content={<>
-                    <TaskInput onSubmit={(value)=>props.onSubmit(value)}/>
+                    <TaskInput onSubmit={(JobName, Description)=>props.onSubmit(JobName, Description)}/>
                     </>}
                     handleClose={togglePopup}
                 />}
