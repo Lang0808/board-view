@@ -4,7 +4,6 @@ import './index.css';
 import Popup from './PopUp';
 import './style.css';
 import axios from 'axios';
-//import './pretty-checkbox.scss';
 
 class Task extends React.Component{
     render(){
@@ -34,11 +33,25 @@ class Board extends React.Component{
     }
 }
 
+class TopMenu extends React.Component{
+    render(){
+        return (
+            <div id="TopMenu">
+                <ul>
+                    <li className="left"><a>About</a></li>
+                    <li className="left"><a>Select date</a></li>
+                </ul>
+            </div>
+        );
+    }
+        
+}
+
 class Main extends React.Component{
     constructor(props){
         super(props);
         this.state={
-            task:[]
+            task:[],
         }
     }
     componentDidMount(){
@@ -50,8 +63,21 @@ class Main extends React.Component{
                 });
             })
             .catch(error=>console.log(error));
-            //console.log(this.state.task);
     };
+    handleDate(e){
+        var today=e.target.value.toString();
+        const newItem={
+            Ngay: today
+        }
+        axios.post('/api/task/date', newItem)
+            .then(res=>{
+                const task=res.data;
+                this.setState({
+                    task: task.task
+                });
+            })
+            .catch(error=>console.log(error));
+    }
     handleSubmit(JobName, Description){
         var today=new Date();
         var dd=String(today.getDate()).padStart(2, '0');
@@ -62,12 +88,7 @@ class Main extends React.Component{
             JobName: JobName,
             Description: Description
         }
-        console.log(today.toString());
-        //console.log(value);
-        /*this.setState({
-            jobs: this.state.jobs.concat(value),
-            status: this.state.status.concat("OK"),
-        });*/
+        console.log(newItem);
         axios.post('/api/insert', newItem)
             .then(res=>{
                 let task=this.state.task;
@@ -77,10 +98,11 @@ class Main extends React.Component{
             .catch(error=>console.log(error));
     }
     render(){
-        //console.log(this.state.jobs);
-        //console.log(this.state.status);
+        const ngay=new Date();
         return (
+            <div>
             <div id="main">
+                <TopMenu/>
                 <div id="table">
                     <Board task={this.state.task}/>
                 </div>
@@ -88,16 +110,10 @@ class Main extends React.Component{
                     <App onSubmit={(JobName, Description)=>this.handleSubmit(JobName, Description)}/>
                 </div>
                 <div>
-                <ul>
-                    {this.state.task.map(item => (
-                    <li key={item.Ngay}>
-                        <h2>{item.JobName}</h2>
-                        <div>{item.Description}</div>
-                    </li>
-                    ))}
-                </ul>
+                    <ChooseDate onChange={(e)=>{this.handleDate(e)}}/>
                 </div>
             </div>
+        </div>
         )
     }
 }
@@ -169,6 +185,29 @@ class TaskInput extends React.Component{
     }
 }
 
+function ChooseDate(props){
+    const [isOpen, setIsOpen]=useState(false);
+    const togglePopup=()=>{
+        setIsOpen(!isOpen);
+    };
+    return (
+        <div>
+            <input type="button"
+                    value="View task in 1 day"
+                    onClick={togglePopup}/>
+            {isOpen &&
+                <Popup content={<>
+                    <input onChange={(e)=>{
+                        togglePopup();
+                        props.onChange(e);
+                    }} type="date" id="date" name="date"/>
+                </>}
+                handleClose={togglePopup}
+            />}
+        </div>
+    );
+}
+
 function App(props){
         const [isOpen, setIsOpen]=useState(false);
         const togglePopup=()=>{
@@ -181,7 +220,10 @@ function App(props){
                         onClick={togglePopup}/>
                 {isOpen && 
                     <Popup content={<>
-                    <TaskInput onSubmit={(JobName, Description)=>props.onSubmit(JobName, Description)}/>
+                    <TaskInput onSubmit={(JobName, Description)=>{
+                        props.onSubmit(JobName, Description);
+                        togglePopup();
+                    }}/>
                     </>}
                     handleClose={togglePopup}
                 />}
@@ -189,6 +231,5 @@ function App(props){
         )    
 }
 
-//https://lokesh-coder.github.io/pretty-checkbox/
 //==================================================
 ReactDOM.render(<Main/>, document.getElementById('root'));

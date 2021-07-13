@@ -22,13 +22,25 @@ connection.connect(function(err) {
 
 app.get('/api/task', (req, res) => {
     var sql = "select * from TaskDate";
+    console.log(sql);
     connection.query(sql, function(err, results) {
         if (err) throw err;
         res.json({ task: results });
     })
 });
 
+app.post('/api/task/date', function (req, res){
+    console.log(req.body);
+    var sql= "select * from TaskDate where Ngay='" + req.body.Ngay + "'";
+    console.log(sql);
+    connection.query(sql, function(err, results) {
+        if (err) throw err;
+        res.json({ task: results });
+    });
+});
+
 app.post('/api/insert', function(req, res) {
+    console.log(req.body);
     var sql = "INSERT "
         + "INTO TaskDate(Ngay, JobName,Description) "
         + "VALUES ('"
