@@ -4,6 +4,16 @@ import './index.css';
 import Popup from './PopUp';
 import './style.css';
 import axios from 'axios';
+import Navbar from './NavBar';
+import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
+import About from './About';
+import Events from './Event';
+import AnnualReport from './Annual';
+import Teams from './team';
+import Blogs from './Blog';
+import SignUp from './SignUp';
+//import {BrowserRouter as Router, Switch, Route, Link} from 'react-router-dom'
+//import {ViewTaskDate} from './Components/date'
 
 class Task extends React.Component{
     render(){
@@ -33,25 +43,43 @@ class Board extends React.Component{
     }
 }
 
-class TopMenu extends React.Component{
+/*class TopMenu extends React.Component{
     render(){
         return (
             <div id="TopMenu">
                 <ul>
                     <li className="left"><a>About</a></li>
-                    <li className="left"><a>Select date</a></li>
+                    <li className="left"><ChooseDate tasks={this.props.tasks} 
+                                                    onChange={(e)=>this.props.onChange(e)}/></li>
                 </ul>
             </div>
         );
-    }
-        
-}
+    }       
+}*/
+
+function TopMenu() {
+    return (
+      <Router>
+        <Navbar />
+        <Switch>
+          {/* <Route path='/' exact component={Home} />*/}
+          <Route path='/about' component={About} />
+          <Route path='/events' component={Events} />
+          <Route path='/annual' component={AnnualReport} />
+          <Route path='/team' component={Teams} />
+          <Route path='/blogs' component={Blogs} />
+          <Route path='/sign-up' component={SignUp} />
+        </Switch>
+      </Router>
+    );
+  }
 
 class Main extends React.Component{
     constructor(props){
         super(props);
         this.state={
             task:[],
+            taskDate: [],
         }
     }
     componentDidMount(){
@@ -65,6 +93,7 @@ class Main extends React.Component{
             .catch(error=>console.log(error));
     };
     handleDate(e){
+        e.preventDefault();
         var today=e.target.value.toString();
         const newItem={
             Ngay: today
@@ -73,7 +102,7 @@ class Main extends React.Component{
             .then(res=>{
                 const task=res.data;
                 this.setState({
-                    task: task.task
+                    taskDate: task.task,
                 });
             })
             .catch(error=>console.log(error));
@@ -102,7 +131,7 @@ class Main extends React.Component{
         return (
             <div>
             <div id="main">
-                <TopMenu/>
+                <TopMenu tasks={this.state.taskDate} onChange={(e)=>{this.handleDate(e)}}/>
                 <div id="table">
                     <Board task={this.state.task}/>
                 </div>
@@ -110,7 +139,7 @@ class Main extends React.Component{
                     <App onSubmit={(JobName, Description)=>this.handleSubmit(JobName, Description)}/>
                 </div>
                 <div>
-                    <ChooseDate onChange={(e)=>{this.handleDate(e)}}/>
+                    <ChooseDate tasks={this.state.taskDate} onChange={(e)=>{this.handleDate(e)}}/>
                 </div>
             </div>
         </div>
@@ -185,7 +214,7 @@ class TaskInput extends React.Component{
     }
 }
 
-function ChooseDate(props){
+/*function ChooseDate(props){
     const [isOpen, setIsOpen]=useState(false);
     const togglePopup=()=>{
         setIsOpen(!isOpen);
@@ -206,6 +235,38 @@ function ChooseDate(props){
             />}
         </div>
     );
+}*/
+
+class ChooseDate extends React.Component{
+    constructor(props){
+        super(props);
+        this.state={
+            isOpen: false,
+            day: '',
+        }
+        this.setIsOpen=this.setIsOpen.bind(this);
+    }
+    setIsOpen(){
+        this.setState({
+            isOpen: !this.state.isOpen,
+        });
+    }
+    render(){
+        return (
+            <div>
+                {/* <input type="button" value="View tasks in 1 day" onClick={()=>this.setIsOpen()}/> */}
+                <button onClick={()=>this.setIsOpen()}>View task in 1 day</button>
+                {this.state.isOpen && 
+                    <Popup content={<>
+                        <input type="date" onChange={(e)=>this.props.onChange(e)}/>
+                        <br/><br/>
+                        <Board task={this.props.tasks}/>
+                    </>}
+                    handleClose={this.setIsOpen}/>
+                }
+            </div>
+        );
+    }
 }
 
 function App(props){
@@ -231,5 +292,6 @@ function App(props){
         )    
 }
 
+//export default Board, Task, TopMenu;
 //==================================================
 ReactDOM.render(<Main/>, document.getElementById('root'));
