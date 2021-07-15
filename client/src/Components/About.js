@@ -1,18 +1,17 @@
 import React from 'react';
   
-const AnnualReport = () => {
+const About = () => {
   return (
     <div
       style={{
         display: 'flex',
         justifyContent: 'Right',
-        alignItems: 'Right',
-        height: '100vh'
+        alignItems: 'Right'
       }}
     >
-      <h1>Annual Report</h1>
+      <h1>Board-view web application wrtitten by Dinh Minh Bao.</h1>
     </div>
   );
 };
   
-export default AnnualReport;
+export default About;
